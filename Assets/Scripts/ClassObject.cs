@@ -4,110 +4,109 @@ using UnityEngine;
 
 public class ClassObject : MonoBehaviour
 {
-
     //---- ФРОНТАЛЬНАЯ ГРАНЬ -----
 
-    public GameObject frontLeftUp;
-    public GameObject frontMiddleUp;
-    public GameObject frontRightUp;
+    private GameObject frontLeftUp;
+    private GameObject frontMiddleUp;
+    private GameObject frontRightUp;
 
-    public GameObject frontLeftMiddle;
-    public GameObject frontCenter;
-    public GameObject frontRightMiddle;
+    private GameObject frontLeftMiddle;
+    private GameObject frontCenter;
+    private GameObject frontRightMiddle;
 
-    public GameObject frontLeftDown;
-    public GameObject frontMiddleDown;
-    public GameObject frontRightDown;  
+    private GameObject frontLeftDown;
+    private GameObject frontMiddleDown;
+    private GameObject frontRightDown;  
 
     //------ ПРАВАЯ ГРАНЬ ----------
 
-    public GameObject rightLeftUp;
-    public GameObject rightMiddleUp;
-    public GameObject rightRightUp;
+    private GameObject rightLeftUp;
+    private GameObject rightMiddleUp;
+    private GameObject rightRightUp;
 
-    public GameObject rightLeftMiddle;
-    public GameObject rightCenter;
-    public GameObject rightRightMiddle;
+    private GameObject rightLeftMiddle;
+    private GameObject rightCenter;
+    private GameObject rightRightMiddle;
 
-    public GameObject rightLeftDown;
-    public GameObject rightMiddleDown;
-    public GameObject rightRightDown;
+    private GameObject rightLeftDown;
+    private GameObject rightMiddleDown;
+    private GameObject rightRightDown;
 
     //------ ЛЕВАЯ ГРАНЬ -----------
 
-    public GameObject leftLeftUp;
-    public GameObject leftMiddleUp;
-    public GameObject leftRightUp;
+    private GameObject leftLeftUp;
+    private GameObject leftMiddleUp;
+    private GameObject leftRightUp;
 
-    public GameObject leftLeftMiddle;
-    public GameObject leftCenter;
-    public GameObject leftRightMiddle;
+    private GameObject leftLeftMiddle;
+    private GameObject leftCenter;
+    private GameObject leftRightMiddle;
 
-    public GameObject leftLeftDown;
-    public GameObject leftMiddleDown;
-    public GameObject leftRightDown;
+    private GameObject leftLeftDown;
+    private GameObject leftMiddleDown;
+    private GameObject leftRightDown;
 
     //------ ВЕРХНЯЯ ГРАНЬ ---------
 
-    public GameObject upLeftUp;
-    public GameObject upMiddleUp;
-    public GameObject upRightUp;
+    private GameObject upLeftUp;
+    private GameObject upMiddleUp;
+    private GameObject upRightUp;
 
-    public GameObject upLeftMiddle;
-    public GameObject upCenter;
-    public GameObject upRightMiddle;
+    private GameObject upLeftMiddle;
+    private GameObject upCenter;
+    private GameObject upRightMiddle;
 
-    public GameObject upLeftDown;
-    public GameObject upMiddleDown;
-    public GameObject upRightDown;
+    private GameObject upLeftDown;
+    private GameObject upMiddleDown;
+    private GameObject upRightDown;
 
     //------ НИЖНЯЯ ГРАНЬ ----------
 
-    public GameObject downLeftUp;
-    public GameObject downMiddleUp;
-    public GameObject downRightUp;
+    private GameObject downLeftUp;
+    private GameObject downMiddleUp;
+    private GameObject downRightUp;
 
-    public GameObject downLeftMiddle;
-    public GameObject downCenter;
-    public GameObject downRightMiddle;
+    private GameObject downLeftMiddle;
+    private GameObject downCenter;
+    private GameObject downRightMiddle;
 
-    public GameObject downLeftDown;
-    public GameObject downMiddleDown;
-    public GameObject downRightDown;
+    private GameObject downLeftDown;
+    private GameObject downMiddleDown;
+    private GameObject downRightDown;
 
     //------ ЗАДНЯЯ ГРАНЬ ---------
 
-    public GameObject backLeftUp;
-    public GameObject backMiddleUp;
-    public GameObject backRightUp;
+    private GameObject backLeftUp;
+    private GameObject backMiddleUp;
+    private GameObject backRightUp;
 
-    public GameObject backLeftMiddle;
-    public GameObject backCenter;
-    public GameObject backRightMiddle;
+    private GameObject backLeftMiddle;
+    private GameObject backCenter;
+    private GameObject backRightMiddle;
 
-    public GameObject backLeftDown;
-    public GameObject backMiddleDown;
-    public GameObject backRightDown;
+    private GameObject backLeftDown;
+    private GameObject backMiddleDown;
+    private GameObject backRightDown;
 
     // МАССИВЫ ОБЪЕКТОВ ПО СТОРОНАМ
 
-    public GameObject[ , ] frontArray;
-    public GameObject[ , ] rightArray;
-    public GameObject[ , ] leftArray;
-    public GameObject[ , ] upArray;
-    public GameObject[ , ] downArray;
-    public GameObject[ , ] backArray;
+    protected GameObject[ , ] frontArray;
+    protected GameObject[ , ] rightArray;
+    protected GameObject[ , ] leftArray;
+    protected GameObject[ , ] upArray;
+    protected GameObject[ , ] downArray;
+    protected GameObject[ , ] backArray;
 
     // ЛОГИЧЕСКИЕ ПОКАЗАТЕЛИ ПОВОРОТОВ ГРАНЕЙ
 
-    public bool frontRotate;
-    public bool rightRotate;
-    public bool leftRotate;
-    public bool upRotate;
-    public bool downRotate;
-    public bool backRotate;
+    private bool frontRotate;
+    private bool rightRotate;
+    private bool leftRotate;
+    private bool upRotate;
+    private bool downRotate;
+    private bool backRotate;
 
-    public void GetAllElement()
+    void Awake()
     {
         // НАХОЖДЕНИЕ ВСЕХ ЭЛЕМЕНТОВ
 
@@ -243,7 +242,7 @@ public class ClassObject : MonoBehaviour
         };  
     }
 
-    public GameObject[ , ] RotateArray(ref GameObject[ , ] array, string result)
+    public void RotateArray(GameObject[ , ] array, string result)
     {
         var temp = array[0, 0];
 
@@ -335,7 +334,6 @@ public class ClassObject : MonoBehaviour
                 break;
             }
         }
-        return array;
     }
 
     private void ResetFrontArray()
@@ -610,13 +608,13 @@ public class ClassObject : MonoBehaviour
         }
     }
 
-    public void SetParent(string name, ref GameObject[ , ] array)
+    public void SetParent(string name)
     {
         switch (name)
         {
             case "frontArray":
             {
-                foreach (var obj in array)
+                foreach (var obj in frontArray)
                 {
                     obj.transform.parent = frontCenter.transform;
                 } 
@@ -624,7 +622,7 @@ public class ClassObject : MonoBehaviour
             }
             case "rightArray":
             {
-                foreach (var obj in array)
+                foreach (var obj in rightArray)
                 {
                     obj.transform.parent = rightCenter.transform;
                     Debug.Log($"Устанавливаем родителя правого массива для элемента {obj}");

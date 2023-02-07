@@ -2,20 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RightEdgeController : MonoBehaviour
+public class RightEdgeController : ClassObject
 {
+    [SerializeField] GameObject Controller;
 
     public float speed = 100f;
 
     Quaternion targetRotation;
 
-    ClassObject classO;
-
     void Start()
     {
-        classO = new ClassObject();
         targetRotation = transform.rotation;
-        classO.GetAllElement();
     }
 
     void Update()
@@ -25,12 +22,13 @@ public class RightEdgeController : MonoBehaviour
 
     void OnMouseDown()
     {
-        classO.SetParent("rightArray", ref classO.rightArray);
+        SetParent("rightArray");
 
         if (Input.GetMouseButtonDown(0))
         {
             targetRotation *= Quaternion.AngleAxis(90f, Vector3.right);
         }
-        classO.RotateArray(ref classO.rightArray, "rightArray");
+
+        RotateArray(rightArray, "rightArray");
     }
 }
