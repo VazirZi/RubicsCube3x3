@@ -1,10 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
+
+// a class, that performs logic for all cube objects 
 
 public class ClassObject : MonoBehaviour
 {
-    //---- ФРОНТАЛЬНАЯ ГРАНЬ -----
+    //---- front edge -----
 
     private GameObject frontLeftUp;
     private GameObject frontMiddleUp;
@@ -18,7 +23,7 @@ public class ClassObject : MonoBehaviour
     private GameObject frontMiddleDown;
     private GameObject frontRightDown;  
 
-    //------ ПРАВАЯ ГРАНЬ ----------
+    //------ right edge ----------
 
     private GameObject rightLeftUp;
     private GameObject rightMiddleUp;
@@ -32,7 +37,7 @@ public class ClassObject : MonoBehaviour
     private GameObject rightMiddleDown;
     private GameObject rightRightDown;
 
-    //------ ЛЕВАЯ ГРАНЬ -----------
+    //------ left edge -----------
 
     private GameObject leftLeftUp;
     private GameObject leftMiddleUp;
@@ -46,7 +51,7 @@ public class ClassObject : MonoBehaviour
     private GameObject leftMiddleDown;
     private GameObject leftRightDown;
 
-    //------ ВЕРХНЯЯ ГРАНЬ ---------
+    //------ up edge ---------
 
     private GameObject upLeftUp;
     private GameObject upMiddleUp;
@@ -60,7 +65,7 @@ public class ClassObject : MonoBehaviour
     private GameObject upMiddleDown;
     private GameObject upRightDown;
 
-    //------ НИЖНЯЯ ГРАНЬ ----------
+    //------ down edge ----------
 
     private GameObject downLeftUp;
     private GameObject downMiddleUp;
@@ -74,7 +79,7 @@ public class ClassObject : MonoBehaviour
     private GameObject downMiddleDown;
     private GameObject downRightDown;
 
-    //------ ЗАДНЯЯ ГРАНЬ ---------
+    //------ back edge ---------
 
     private GameObject backLeftUp;
     private GameObject backMiddleUp;
@@ -88,30 +93,33 @@ public class ClassObject : MonoBehaviour
     private GameObject backMiddleDown;
     private GameObject backRightDown;
 
-    // МАССИВЫ ОБЪЕКТОВ ПО СТОРОНАМ
+    // arrays of face objects
 
-    protected GameObject[ , ] frontArray;
-    protected GameObject[ , ] rightArray;
-    protected GameObject[ , ] leftArray;
-    protected GameObject[ , ] upArray;
-    protected GameObject[ , ] downArray;
-    protected GameObject[ , ] backArray;
+    public GameObject[ , ] frontArray;
+    public GameObject[ , ] rightArray;
+    public GameObject[ , ] leftArray;
+    public GameObject[ , ] upArray;
+    public GameObject[ , ] downArray;
+    public GameObject[ , ] backArray;
 
-    // ЛОГИЧЕСКИЕ ПОКАЗАТЕЛИ ПОВОРОТОВ ГРАНЕЙ
+    // logical indicators of face rotation
 
-    private bool frontRotate;
-    private bool rightRotate;
-    private bool leftRotate;
-    private bool upRotate;
-    private bool downRotate;
-    private bool backRotate;
+    private bool isFrontRotate;
+    private bool isRightRotate;
+    private bool isLeftRotate;
+    private bool isUpRotate;
+    private bool isDownRotate;
+    private bool isBackRotate;
+
+    private GameObject mainCube;
 
     void Awake()
     {
-        // НАХОЖДЕНИЕ ВСЕХ ЭЛЕМЕНТОВ
+        // find all elements
 
+        mainCube = GameObject.Find("Cube");
 
-        // ФРОНТАЛЬНАЯ ГРАНЬ
+        // front edge
 
         frontLeftUp = GameObject.Find("FrontLeftUp");
         frontMiddleUp = GameObject.Find("FrontMiddleUp");
@@ -125,7 +133,7 @@ public class ClassObject : MonoBehaviour
         frontMiddleDown = GameObject.Find("FrontMiddleDown");
         frontRightDown = GameObject.Find("FrontRightDown");
     
-        // ПРАВАЯ ГРАНЬ
+        // right edge
 
         rightLeftUp = GameObject.Find("FrontRightUp");
         rightMiddleUp = GameObject.Find("MiddleRightUp");
@@ -139,7 +147,7 @@ public class ClassObject : MonoBehaviour
         rightMiddleDown = GameObject.Find("MiddleRightDown");
         rightRightDown = GameObject.Find("BackRightDown");
 
-        // ЛЕВАЯ ГРАНЬ
+        // left edge
 
         leftLeftUp = GameObject.Find("BackLeftUp");
         leftMiddleUp = GameObject.Find("MiddleLeftUp");
@@ -153,7 +161,7 @@ public class ClassObject : MonoBehaviour
         leftMiddleDown = GameObject.Find("MiddleLeftDown");
         leftRightDown = GameObject.Find("FrontLeftDown");
 
-        // ВЕРХНЯЯ ГРАНЬ
+        // up edge
 
         upLeftUp = GameObject.Find("BackLeftUp");
         upMiddleUp = GameObject.Find("BackMiddleUp");
@@ -167,7 +175,7 @@ public class ClassObject : MonoBehaviour
         upMiddleDown = GameObject.Find("FrontMiddleUp");
         upRightDown = GameObject.Find("FrontRightUp");
 
-        // НИЖНЯЯ ГРАНЬ
+        // down edge
 
         downLeftUp = GameObject.Find("FrontLeftDown");
         downMiddleUp = GameObject.Find("FrontMiddleDown");
@@ -181,7 +189,7 @@ public class ClassObject : MonoBehaviour
         downMiddleDown = GameObject.Find("BackMiddleDown");
         downRightDown = GameObject.Find("BackRightDown");
 
-        // ЗАДНЯЯ ГРАНЬ
+        // back edge
 
         backLeftUp = GameObject.Find("BackRightUp");
         backMiddleUp = GameObject.Find("BackMiddleUp");
@@ -196,8 +204,7 @@ public class ClassObject : MonoBehaviour
         backRightDown = GameObject.Find("BackLeftDown");
 
 
-
-        // ЗАПОЛНЕНИЕ МАССИВОВ В СТРОГОМ ПОРЯДКЕ
+        // filling in all arrays in a strictly defined order
 
         frontArray = new GameObject[3, 3]
         {
@@ -242,9 +249,11 @@ public class ClassObject : MonoBehaviour
         };  
     }
 
-    public void RotateArray(GameObject[ , ] array, string result)
+    // the method of turing the face clockwise
+
+    public void RotateArray(GameObject[ , ] array, string name)
     {
-        var temp = array[0, 0];
+        var temp = array[0, 0];     // variable to replace
 
         array[0, 0] = array[2, 0];
         array[2, 0] = array[2, 2];
@@ -252,93 +261,94 @@ public class ClassObject : MonoBehaviour
         array[0, 2] = temp;
 
         temp = array[1, 0];
+
         array[1, 0] = array[2, 1];
         array[2, 1] = array[1, 2];
         array[1, 2] = array[0, 1];
         array[0, 1] = temp;
 
-        Debug.Log(result);
-
-        switch (result)
+        switch (name)
         {
             case "frontArray":
             {
-                frontRotate = true;
+                isFrontRotate = true;
 
-                ResetUpArray();
-                ResetRightArray();
-                ResetLeftArray();
-                ResetDownArray();
+                TurnUpArray();
+                TurnRightArray();
+                TurnDownArray();
+                TurnLeftArray();
 
-                frontRotate = false;
+                isFrontRotate = false;
                 break;
             }
             case "rightArray":
             {
-                rightRotate = true;
+                isRightRotate = true;
 
-                ResetUpArray();
-                ResetFrontArray();
-                ResetBackArray();
-                ResetDownArray();
+                TurnUpArray();
+                TurnBackArray();
+                TurnDownArray();
+                TurnFrontArray();
 
-                rightRotate = false;
+                isRightRotate = false;
                 break;
             }
             case "leftArray":
             {
-                leftRotate = true; 
+                isLeftRotate = true; 
 
-                ResetUpArray();
-                ResetBackArray();
-                ResetFrontArray();
-                ResetDownArray();
+                TurnUpArray();
+                TurnFrontArray(); 
+                TurnDownArray();
+                TurnBackArray();
 
-                leftRotate = false;
+                isLeftRotate = false;
                 break;
             }
             case "upArray":
             {
-                upRotate = true; 
+                isUpRotate = true; 
 
-                ResetBackArray();
-                ResetRightArray();
-                ResetLeftArray();
-                ResetFrontArray();
+                TurnBackArray();
+                TurnRightArray();
+                TurnFrontArray();
+                TurnLeftArray();
 
-                upRotate = false;
+                isUpRotate = false;
                 break;
             }
             case "downArray":
             {
-                downRotate = true;
+                isDownRotate = true;
 
-                ResetFrontArray();
-                ResetLeftArray();
-                ResetRightArray();
-                ResetBackArray();
+                TurnFrontArray();
+                TurnRightArray();
+                TurnBackArray();
+                TurnLeftArray();
 
-                downRotate = false;
+                isDownRotate = false;
                 break;
             }
             case "backArray":
             {
-                backRotate = true; 
+                isBackRotate = true; 
 
-                ResetUpArray();
-                ResetRightArray();
-                ResetLeftArray();
-                ResetDownArray();
+                TurnUpArray();
+                TurnLeftArray();
+                TurnDownArray();
+                TurnRightArray();
 
-                backRotate = false;
+                isBackRotate = false;
                 break;
             }
         }
     }
 
-    private void ResetFrontArray()
+    // the method of turing the frontal face
+
+    private void TurnFrontArray()
     {
-        if (upRotate == true)
+        if (isUpRotate)
         {
             int j = 0;
             int k = 2;
@@ -348,7 +358,7 @@ public class ClassObject : MonoBehaviour
                 frontArray[j, i] = upArray[k, i];
             }
         }
-        else if (rightRotate == true)
+        else if (isRightRotate)
         {
             int j = 0;
             int k = 2;
@@ -358,7 +368,7 @@ public class ClassObject : MonoBehaviour
                 frontArray[i, k] = rightArray[i, j];
             }
         }
-        else if (leftRotate == true)
+        else if (isLeftRotate)
         {
             int j = 0;
             int k = 2;
@@ -368,7 +378,7 @@ public class ClassObject : MonoBehaviour
                 frontArray[i, j] = leftArray[i, k];
             }
         }
-        else if (downRotate == true)
+        else if (isDownRotate)
         {
             int j = 0;
             int k = 2;
@@ -380,11 +390,11 @@ public class ClassObject : MonoBehaviour
         }
     }
 
-    private void ResetRightArray()
-    {
-        Debug.Log("Перезапись правой стороны");
+    // the method of turing the right face
 
-        if (frontRotate == true)
+    private void TurnRightArray()
+    {
+        if (isFrontRotate)
         {
             int j = 0;
             int k = 2;
@@ -392,11 +402,9 @@ public class ClassObject : MonoBehaviour
             for (int i = 0; i < 3; i++)
             {
                 rightArray[i, j] = frontArray[i, k];
-
-                Debug.Log("Элемент левого столбца правой стороны заменен на   " + rightArray[i, j]);
             }
         }
-        else if (backRotate == true)
+        else if (isBackRotate)
         {
             int j = 0;
             int k = 2;
@@ -406,17 +414,19 @@ public class ClassObject : MonoBehaviour
                 rightArray[i, k] = backArray[i, j];
             }
         }
-        else if (upRotate == true)
+        else if (isUpRotate)
         {
             int j = 0;
             int k = 2;
+            int t = 2;
 
             for (int i = 0; i < 3; i++)
             {
-                rightArray[j, i] = upArray[i, k];
+                rightArray[j, i] = upArray[t, k];
+                t--;
             }
         }
-        else if (downRotate == true)
+        else if (isDownRotate)
         {
             int k = 2;
 
@@ -427,11 +437,11 @@ public class ClassObject : MonoBehaviour
         }
     }
 
-    private void ResetLeftArray()
-    {
-        Debug.Log("Перезапись левого массива");
+    // the method of turing the left face
 
-        if (frontRotate == true)
+    private void TurnLeftArray()
+    {
+        if (isFrontRotate)
         {
             int j = 0;
             int k = 2;
@@ -439,11 +449,9 @@ public class ClassObject : MonoBehaviour
             for (int i = 0; i < 3; i++)
             {
                 leftArray[i, k] = frontArray[i, j];
-
-                Debug.Log("Элемент правого столбца левого массива заменен на   " + leftArray[i, k]);
             }
         }
-        else if (backRotate == true)
+        else if (isBackRotate)
         {
             int j = 0;
             int k = 2;
@@ -453,7 +461,7 @@ public class ClassObject : MonoBehaviour
                 leftArray[i, j] = backArray[i, k];
             }
         }
-        else if (upRotate == true)
+        else if (isUpRotate)
         {
             int j = 0;
 
@@ -462,23 +470,25 @@ public class ClassObject : MonoBehaviour
                 leftArray[j, i] = upArray[i, j];
             }
         }
-        else if (downRotate == true)
+        else if (isDownRotate)
         {
             int j = 0;
             int k = 2;
+            int t = 2;
 
             for (int i = 0; i < 3; i++)
             {
-                leftArray[k, i] = downArray[i, j];
+                leftArray[k, i] = downArray[t, j];
+                t--;
             }
         }
     }
 
-    private void ResetUpArray()
-    {
-        Debug.Log("Перезапись верхнего массива");
+    // the method of turing the up face
 
-        if (frontRotate == true)
+    private void TurnUpArray()
+    {
+        if (isFrontRotate)
         {
             int j = 0;
             int k = 2;
@@ -486,30 +496,32 @@ public class ClassObject : MonoBehaviour
             for (int i = 0; i < 3; i++)
             {
                 upArray[k, i] = frontArray[j, i];
-
-                Debug.Log("Элемент нижней строки верхнего массива заменен на   " + upArray[k, i]);
             }
         }
-        else if (backRotate == true)
+        else if (isBackRotate)
         {
             int j = 0;
+            int t = 2;
 
             for (int i = 0; i < 3; i++)
             {
-                upArray[j, i] = backArray[j, i];
+                upArray[j, i] = backArray[j, t];
+                t--;
             }
         }
-        else if (rightRotate == true)
+        else if (isRightRotate)
         {
             int j = 0;
             int k = 2;
+            int t = 2;
 
             for (int i = 0; i < 3; i++)
             {
-                upArray[i, k] = rightArray[j, i];
+                upArray[i, k] = rightArray[j, t];
+                t--;
             }
         }
-        else if (leftRotate == true)
+        else if (isLeftRotate)
         {
             int j = 0;
 
@@ -520,11 +532,11 @@ public class ClassObject : MonoBehaviour
         }
     }
 
-    private void ResetDownArray()
-    {
-        Debug.Log("Перезапись нижнего массива");
+    // the method of turing the down face
 
-        if (frontRotate == true)
+    private void TurnDownArray()
+    {
+        if (isFrontRotate)
         {
             int j = 0;
             int k = 2;
@@ -532,20 +544,20 @@ public class ClassObject : MonoBehaviour
             for (int i = 0; i < 3; i++)
             {
                 downArray[j, i] = frontArray[k, i];
-                
-                Debug.Log("Элемент верхней строки нижнего массива заменен на   " + downArray[j, i]);
             }
         }
-        else if (backRotate == true)
+        else if (isBackRotate)
         {
             int k = 2;
+            int t = 2;
 
             for (int i = 0; i < 3; i++)
             {
-                downArray[k, i] = backArray[k, i];
+                downArray[k, i] = backArray[k, t];
+                t--;
             }
         }
-        else if (rightRotate == true)
+        else if (isRightRotate)
         {
             int k = 2;
 
@@ -554,30 +566,36 @@ public class ClassObject : MonoBehaviour
                 downArray[i, k] = rightArray[k, i];
             }
         }
-        else if (leftRotate == true)
+        else if (isLeftRotate)
         {
             int j = 0;
             int k = 2;
+            int t = 2;
 
             for (int i = 0; i < 3; i++)
             {
-                downArray[i, j] = leftArray[k, i];
+                downArray[i, j] = leftArray[k, t];
+                t--;
             }
         }
     }
 
-    private void ResetBackArray()
+    // the method of turing the back face
+
+    private void TurnBackArray()
     {
-        if (upRotate == true)
+        if (isUpRotate)
         {
             int j = 0;
+            int t = 2;
 
             for (int i = 0; i < 3; i++)
             {
-                backArray[j, i] = upArray[j, i];
+                backArray[j, i] = upArray[j, t];
+                t--;
             }
         }
-        else if (leftRotate == true)
+        else if (isLeftRotate)
         {
             int j = 0;
             int k = 2;
@@ -587,7 +605,7 @@ public class ClassObject : MonoBehaviour
                 backArray[i, k] = leftArray[i, j];
             }
         }
-        else if (rightRotate == true)
+        else if (isRightRotate)
         {
             int j = 0;
             int k = 2;
@@ -597,16 +615,20 @@ public class ClassObject : MonoBehaviour
                 backArray[i, j] = rightArray[i, k];
             }
         }
-        else if (downRotate == true)
+        else if (isDownRotate)
         {
             int k = 2;
+            int t = 2;
 
             for (int i = 0; i < 3; i++)
             {
-                backArray[k, i] = downArray[i, k];
+                backArray[k, i] = downArray[k, t];
+                t--;
             }
         }
     }
+
+    // parent installation method
 
     public void SetParent(string name)
     {
@@ -625,8 +647,98 @@ public class ClassObject : MonoBehaviour
                 foreach (var obj in rightArray)
                 {
                     obj.transform.parent = rightCenter.transform;
-                    Debug.Log($"Устанавливаем родителя правого массива для элемента {obj}");
                 } 
+                break;
+            }
+            case "upArray":
+            {
+                foreach (var obj in upArray)
+                {
+                    obj.transform.parent = upCenter.transform;
+                }
+                break;
+            }
+            case "leftArray":
+            {
+                foreach (var obj in leftArray)
+                {
+                    obj.transform.parent = leftCenter.transform;
+                }
+                break;
+            }
+            case "backArray":
+            {
+                foreach (var obj in backArray)
+                {
+                    obj.transform.parent = backCenter.transform;
+                }
+                break;
+            }
+            case "downArray":
+            {
+                foreach (var obj in downArray)
+                {
+                    obj.transform.parent = downCenter.transform;
+                }
+                break;
+            }
+        }
+    }
+
+    // parent reset method
+
+    public async Task ResetParent(string name)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(0.9f));   // waiting for the completion of the face rotation
+
+        switch (name)
+        {
+            case "frontArray":
+            {
+                foreach (var obj in frontArray)
+                {
+                    obj.transform.parent = mainCube.transform;
+                } 
+                break;
+            }
+            case "rightArray":
+            {
+                foreach (var obj in rightArray)
+                {
+                    obj.transform.parent = mainCube.transform;
+                } 
+                break;
+            }
+            case "upArray":
+            {
+                foreach (var obj in upArray)
+                {
+                    obj.transform.parent = mainCube.transform;
+                }
+                break;
+            }
+            case "leftArray":
+            {
+                foreach (var obj in leftArray)
+                {
+                    obj.transform.parent = mainCube.transform;
+                }
+                break;
+            }
+            case "backArray":
+            {
+                foreach (var obj in backArray)
+                {
+                    obj.transform.parent = mainCube.transform;
+                }
+                break;
+            }
+            case "downArray":
+            {
+                foreach (var obj in downArray)
+                {
+                    obj.transform.parent = mainCube.transform;
+                }
                 break;
             }
         }

@@ -1,34 +1,26 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class FrontEdgeController : ClassObject
+// class controller for front (green) edge of cube
+
+public class FrontEdgeController : Controller
 {
-    [SerializeField] GameObject Controller;
+    // method for set parent of front array by pressing the left mouse button
 
-    public float speed = 100f;
-
-    Quaternion targetRotation;
-
-    void Start()
+    private void OnMouseDown()
     {
-        targetRotation = transform.rotation;
-    }
+        controller.SetParent("frontArray");
 
-    void Update()
-    {
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, Time.deltaTime * speed);
-    }
-
-    void OnMouseDown()
-    {
-        SetParent("frontArray");
-        
         if (Input.GetMouseButtonDown(0))
         {
             targetRotation *= Quaternion.AngleAxis(90f, Vector3.back);
         }
 
-        RotateArray(frontArray, "frontArray");
+        controller.RotateArray(controller.frontArray, "frontArray");
+        controller.ResetParent("frontArray");
     }
 }

@@ -1,34 +1,26 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class RightEdgeController : ClassObject
+// class controller for right (red) edge of cube
+
+public class RightEdgeController : Controller
 {
-    [SerializeField] GameObject Controller;
+    // method for set parent of right array by pressing the left mouse button
 
-    public float speed = 100f;
-
-    Quaternion targetRotation;
-
-    void Start()
+    private void OnMouseDown()
     {
-        targetRotation = transform.rotation;
-    }
-
-    void Update()
-    {
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, Time.deltaTime * speed);
-    }
-
-    void OnMouseDown()
-    {
-        SetParent("rightArray");
+        controller.SetParent("rightArray");
 
         if (Input.GetMouseButtonDown(0))
         {
             targetRotation *= Quaternion.AngleAxis(90f, Vector3.right);
         }
 
-        RotateArray(rightArray, "rightArray");
+        controller.RotateArray(controller.rightArray, "rightArray");
+        controller.ResetParent("rightArray");
     }
 }
